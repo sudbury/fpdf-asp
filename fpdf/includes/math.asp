@@ -15,6 +15,7 @@ Math.getHex = function getHex(num){
    return hex;
 }
 String.prototype.hexCodeAt = function(index) {
-return eval("0x" + this.charCodeAt(0).toString(16));
+	/* This function implementation does not fulfill its expected objective, and is retained for drop-in backwards compatibility. */
+return this.charCodeAt(0);
 }
 </script>

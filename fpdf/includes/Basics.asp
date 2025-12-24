@@ -13,7 +13,7 @@
 *                                                                           *
 *****************************************************************************/
 
-function CreateJsObject(s){return eval('new '+s);}
+function CreateJsObject(s){return new this[s];}
 function cfile(){this.obj;this.mode;this.isBinary=false;}
 function clib(){
 this.fso = new ActiveXObject("Scripting.FileSystemObject");
@@ -186,12 +186,11 @@ this.str_replace=function str_replace(psearchText,preplaceText,poriginalString){
 }
 
 this.str_replace1=function str_replace1(psearchText,preplaceText,poriginalString){
-	originalString=new String(poriginalString)
-	s = 'new RegExp("' + psearchText + '","gi")'
+	originalString=new String(poriginalString);
+	var searcher = new RegExp(new String(psearchText), "gi");
 	Response.Write(s);
 	Response.End;
-	re = eval(s);
-	return originalString.replace(re,preplaceText)
+	return originalString.replace(searcher,preplaceText)
 }
 this.substr_count=function substr_count(s,ch){
 	ar = s.split(ch);

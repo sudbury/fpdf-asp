@@ -1305,12 +1305,8 @@ this.SetFont=function SetFont(xfamily , xstyle , xsize)
 		this._LoadExtension(this.MODELSPATH +path+".mod");
 	}
 	this.ExtendsCode=function ExtendsCode(AddTo,CodeAdd){
-		Code = new String(eval("this." + AddTo));
-		CodeAdd = new String(CodeAdd);
-		pI = CodeAdd.indexOf("{")+1;pE = CodeAdd.lastIndexOf("}")
-		sToAdd = CodeAdd.substring(pI,pE)
-		pE = Code.lastIndexOf("}")
-		eval("this." + AddTo + "=" + Code.substring(0,pE) + "\n" + sToAdd +"}");
+		var existingFunction = this[AddTo];
+		this[AddTo] = function() {existingFunction.apply(this, arguments);  CodeAdd.apply(this, arguments);};
 	}
 }
 

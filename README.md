@@ -2,19 +2,20 @@
 
 ASP (classic) version of fpdf for PHP with accessibility tags.
 
-Here's how to add certain accessibility tags to your PDF when pursuing WCAG compliance (an understanding of relevant portions of the PDF specification is recommended):
+Here's how to add certain accessibility tags to your existing PDF generation logic when pursuing WCAG compliance (an understanding of relevant portions of the PDF specification is recommended):
 
-1. Change the created object from ``FPDF`` to ``FPDFTagged``
+1. Change the include file from ``fpdf.asp`` to ``fpdf_tagged.asp``.
+2. Change the created object from ``FPDF`` to ``FPDFTagged``:
    ```vbscript
    Dim PDFWriter
    Set PDFWriter = CreateJsObject("FPDFTagged")
    ```
-2. Before your first usage of marked content, initialize the ``Document`` top-level tag:
+3. Before your first usage of marked content, initialize the ``Document`` top-level tag:
    ```vbscript
    Dim StructureDocument
    Set StructureDocument = PDFWriter.InitializeMarkedContent()
    ```
-3. Add tags according to the following:
+4. Add tags according to the following:
    - Surround your flat ``Cell`` or ``Write`` calls with the corresponding tag:
      ```vbscript
      Const CellHeight = 5

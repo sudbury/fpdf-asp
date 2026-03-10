@@ -697,7 +697,7 @@ function FPDFTagged_PutResourcesExtended()
 	var metadata = metadataOutput.join(String());
 
 	this._newobj();
-	this._out("<</Length " + lib.strlen(metadata) + ">>");
+	this._out("<</Type /Metadata /Subtype /XML /Length " + lib.strlen(metadata) + ">>");
 	this._putstream(metadata);
 	this._out("endobj");
 

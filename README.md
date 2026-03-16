@@ -2,7 +2,7 @@
 
 ASP (classic) version of fpdf for PHP with accessibility tags.
 
-Here's how to add certain accessibility tags to your existing PDF generation logic when pursuing WCAG compliance (an understanding of relevant portions of the PDF specification is recommended):
+Here's how to add certain accessibility tags to your existing PDF generation logic when pursuing WCAG compliance (an understanding of relevant portions of the [PDF specification](https://pdfa.org/resource/pdf-specification-archive/) is recommended; the inline documentation uses PDF Reference, sixth edition, Adobe Portable Document Format version 1.7, November 2006):
 
 1. Change the include file from ``fpdf.asp`` to ``fpdf_tagged.asp``.
 2. Change the created object from ``FPDF`` to ``FPDFTagged``:

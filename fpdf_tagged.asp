@@ -48,6 +48,7 @@ ID	gen.	description
 */
 }
 
+/* Represents the structure tree root, referenced from the document catalog.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
 function FPDFTaggedStructureRoot()
 {
 	this.DocumentNode = null;
@@ -78,6 +79,7 @@ function FPDFTaggedStructureRoot_Output(FPDFTagged)
 	var parentTreeOutput = [];
 	var pageMarkedContentListList = FPDFTagged.PageMarkedContentListList;
 	var pageCount = pageMarkedContentListList.length;
+	/* PDF 1.7 specification table 3.34 "Entries in a number tree node dictionary". */
 	parentTreeOutput.push("<</Nums [");
 	for(var pageIndex = 0;  pageIndex < pageCount;  pageIndex++)
 	{
@@ -103,6 +105,7 @@ function FPDFTaggedStructureRoot_Output(FPDFTagged)
 	var documentNode = this.DocumentNode;
 	if(documentNode !== null)
 	{
+		/* PDF 1.7 specification table 10.9 "Entries in the structure tree root". */
 		FPDFTagged._newobj();
 		FPDFTagged._out("<</Type /StructTreeRoot /K " + documentNode.ObjectID.toString() + " " + documentNode.ObjectGeneration.toString() + " R /ParentTree " + parentTreeOutput.join(String()) + " /ParentTreeNextKey " + pageCount.toString() + ">>");
 		FPDFTagged._out("endobj");
@@ -110,6 +113,7 @@ function FPDFTaggedStructureRoot_Output(FPDFTagged)
 	}
 }
 
+/* Represents a structure element, referenced from the structure tree root or other structure elements.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
 function FPDFTaggedStructureNode()
 {
 	this.Parent = null;
@@ -190,6 +194,7 @@ function FPDFTaggedStructureNode_Output(FPDFTagged)
 
 	var parentNode = this.Parent;
 
+	/* PDF 1.7 specification table 10.10 "Entries in a structure element dictionary". */
 	FPDFTagged._newobj();
 	FPDFTagged._out("<</Type /StructElem /S /" + this.Tag + " /Pg " + (3 + this.PageIndex * 2).toString() + " 0 R /P " + parentNode.ObjectID.toString() + " " + parentNode.ObjectGeneration.toString() + " R /K " + kidOutput.join(String()) + "]" + ((attributeOutput !== null) ? (" /A [<<" + attributeOutput.join(String()) + ">>]") : ("")) + ((this.AlternativeText !== null) ? (" /Alt " + FPDFTagged._textstring(this.AlternativeText)) : ("")) + ">>");
 	FPDFTagged._out("endobj");
@@ -211,6 +216,7 @@ function FPDFTaggedStructureNode_SetAlternativeText(alternativeText)
 	this.AlternativeText = alternativeText;
 }
 
+/* Represents a structure element for a marked-content sequence, referenced from other structure elements.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
 function FPDFTaggedMarkedContentNode()
 {
 	FPDFTaggedStructureNode.call(this);
@@ -251,6 +257,7 @@ function FPDFTaggedMarkedContentNode_Output(FPDFTagged)
 
 	var parentNode = this.Parent;
 
+	/* PDF 1.7 specification table 10.10 "Entries in a structure element dictionary". */
 	FPDFTagged._newobj();
 	FPDFTagged._out("<</Type /StructElem /S /" + this.Tag + " /Pg " + (3 + this.PageIndex * 2).toString() + " 0 R /P " + parentNode.ObjectID.toString() + " " + parentNode.ObjectGeneration.toString() + " R /K " + this.MarkedContentID.toString() + ((attributeOutput !== null) ? (" /A [<<" + attributeOutput.join(String()) + ">>]") : ("")) + ((this.AlternativeText !== null) ? (" /Alt " + FPDFTagged._textstring(this.AlternativeText)) : ("")) + ">>");
 	FPDFTagged._out("endobj");
@@ -277,22 +284,30 @@ function FPDFTagged_StartMarkedContent(tag)
 	markedContentNode.MarkedContentID = markedContentID;
 	markedContentNode.Tag = tag;
 	pageMarkedContentList.push(markedContentNode);
+	/* PDF 1.7 specification section 10.6.3 "Structure Content" subsection "Marked-Content Sequences as Content Items". */
 	this._out("/" + tag + " <</MCID " + markedContentID.toString() + ">> BDC");
 	return markedContentNode;
 }
 
 function FPDFTagged_StartLineBreakMarkedContent()
 {
+	/* PDF 1.7 specification table 10.7 "Marked-content operators". */
+	/* PDF 1.7 specification table 10.10 "Entries in a structure element dictionary". */
+	/* PDF 1.7 specification table 10.7.4 "Standard Structure Attributes". */
 	this._out("/Span <</ActualText <0D0A>>> BDC");
 }
 
 function FPDFTagged_StartArtifactLayoutMarkedContent()
 {
+	/* PDF 1.7 specification table 10.7 "Marked-content operators". */
+	/* PDF 1.7 specification table 10.10 "Entries in a structure element dictionary". */
+	/* PDF 1.7 specification table 10.17 "Property list entries for artifacts". */
 	this._out("/Artifact <</Type /Layout>> BDC");
 }
 
 function FPDFTagged_FinishMarkedContent()
 {
+	/* PDF 1.7 specification table 10.7 "Marked-content operators". */
 	this._out("EMC");
 }
 
@@ -311,7 +326,9 @@ function FPDFTagged_ApplyStructureElementAttributesForTableHeaderScopeColumn(mar
 		attributeDirectory = {};
 		markedContentNode.AttributeDirectory = attributeDirectory;
 	}
+	/* PDF 1.7 specification table 10.28 "Standard attribute owners". */
 	attributeDirectory["/O"] = "/Table";
+	/* PDF 1.7 specification table 10.36 "Standard table attributes". */
 	attributeDirectory["/Scope"] = "/Column";
 }
 
@@ -323,13 +340,16 @@ function FPDFTagged_ApplyStructureElementAttributesForList(markedContentNode, li
 		attributeDirectory = {};
 		markedContentNode.AttributeDirectory = attributeDirectory;
 	}
+	/* PDF 1.7 specification table 10.28 "Standard attribute owners". */
 	attributeDirectory["/O"] = "/List";
+	/* PDF 1.7 specification table 10.34 "Standard list attribute". */
 	attributeDirectory["/ListNumbering"] = "/" + listNumbering;
 }
 
 function FPDFTagged_begindoc()
 {
 	this.state=1;
+	/* PDF 1.7 specification section 3.4.1 "File Header". */
 	this._out("%PDF-1.7");
 }
 
@@ -340,6 +360,7 @@ function FPDFTagged_ImageTagged(xfile , xx , xy , xw , xh , xtype , xlink, image
 		if (arguments.length<6){xtype=""};
 		if (arguments.length<7){xlink=""};
 
+	/* This library object is not in scope. */
 	var lib = new clib();
 		if(!lib.isset(this.images[xfile]))
 			{
@@ -360,6 +381,7 @@ function FPDFTagged_ImageTagged(xfile , xx , xy , xw , xh , xtype , xlink, image
 		if(xw==0)xw=xh*xinfo["w"]/xinfo["h"];
 		if(xh==0)xh=xw*xinfo["h"]/xinfo["w"];
 
+	/* Determine the bounding box dimensions. */
 	var imageWidth = xw*this.k;
 	var imageHeight = xh*this.k;
 	var imageLeft = xx*this.k;
@@ -373,8 +395,11 @@ function FPDFTagged_ImageTagged(xfile , xx , xy , xw , xh , xtype , xlink, image
 		attributeDirectory = {};
 		imageMarkedContentNode.AttributeDirectory = attributeDirectory;
 	}
+	/* PDF 1.7 specification table 10.28 "Standard attribute owners". */
 	attributeDirectory["/O"] = "/Layout";
+	/* PDF 1.7 specification table 10.30 "Standard layout attributes common to all standard structure types". */
 	attributeDirectory["/Placement"] = "/Block";
+	/* PDF 1.7 specification table 10.31 "Additional standard layout attributes specific to block-level structure elements". */
 	attributeDirectory["/BBox"] = "[" + imageLeft.toString() + " " + imageBottom.toString() + " " + imageRight.toString() + " " + imageTop.toString() + "]";
 
 		 this._out(lib.sprintf("q %.2f 0 0 %.2f %.2f %.2f cm /I%d Do Q", imageWidth, imageHeight, imageLeft, imageBottom, xinfo["i"]));
@@ -391,6 +416,7 @@ function FPDFTagged_Write(xh , xtxt , xlink)
 		var xi;
 		if (arguments.length<3) {xlink=""};
 
+	/* This library object is not in scope. */
 	var lib = new clib();
 
 		var xcw=this.CurrentFont["cw"];
@@ -450,6 +476,7 @@ function FPDFTagged_Write(xh , xtxt , xlink)
 
 					{
 					 this.Cell(xw,xh,lib.substr(xs,xj,xsep-xj),0,2,"",0,xlink);
+						/* Include a space (per the variable 'xc') at the end of the wrapped line (between words) for accurate extracted sentences. */
 						this._out("BT ( ) Tj ET");
 					xi=xsep+1;
 					}
@@ -471,6 +498,7 @@ function FPDFTagged_Write(xh , xtxt , xlink)
 
 function FPDFTagged_SetLanguageCode(languageCode)
 {
+	/* PDF 1.7 specification section 10.8.1 "Natural Language Specification" subsection "Language Identifiers". */
 	this.LanguageCode = languageCode;
 }
 
@@ -522,15 +550,19 @@ function FPDFTagged_ConvertDateToPDFDate(targetDate)
 	{
 		secondText = "0" + secondText;
 	}
+	/* PDF 1.7 specification section 3.8.3 "Dates". */
 	var targetDateTimeText = "D:" + yearText + monthText + dayText + hourText + minuteText + secondText + "Z";
 	return targetDateTimeText;
 }
 
 function FPDFTagged_putinfo()
 {
+	/* This library object is not in scope. */
 	var lib = new clib();
+	/* Use shared functions to retrieve metadata values. */
 	var creationDate = this.GetCreationDate();
 	var producer = this.GetProducer();
+	/* PDF 1.7 specification table 10.2 "Entries in the document information dictionary". */
 	this._out("/Producer " + this._textstring(producer));
 	if(!lib.empty(this.title))this._out("/Title " + this._textstring(this.title));
 	if(!lib.empty(this.subject))this._out("/Subject " + this._textstring(this.subject));
@@ -542,8 +574,8 @@ function FPDFTagged_putinfo()
 
 function FPDFTagged_putpages()
 {
+	/* This library object is not in scope. */
 	var lib = new clib();
-	/* Add the Tabs entry and append the structure tree. */
 		xnb=this.page;
 		if(!lib.empty(this.AliasNbPages))
 			{
@@ -587,9 +619,13 @@ function FPDFTagged_putpages()
 					}
 				 this._out(xannots + "]");
 				}
+
+			/* Specify the tab order and the structural parent tree's key representing this page. */
+			/* PDF 1.7 specification table 3.27 "Entries in a page object". */
 			this._out("/Tabs /S");
 			var pageIndex = xn - 1;
 			this._out("/StructParents " + pageIndex.toString());
+
 			 this._out("/Contents " + (this.n+1) + " 0 R>>");
 			 this._out("endobj");
 			 xp=(this.compress)?this.gzcompress(this.pages[xn]):
@@ -609,9 +645,12 @@ function FPDFTagged_putpages()
 		 this._out(lib.sprintf("/MediaBox [0 0 %.2f %.2f]",xwPt,xhPt));
 		 this._out(">>");
 		 this._out("endobj");
+
+	/* Render the structure element root object and its children.  Since they are closely associated with the page content, we render them alongside the page objects. */
 	var structureRoot = this.StructureRoot;
 	if(structureRoot !== null)
 	{
+		/* The rendering process will reserve the object numbers using '_newobj'.  Therefore, we need to allocate them in the same order that they will be rendered so that indirect object references for tree structure cross-references can have the correct object numbers as they are rendered live. */
 		structureRoot.AllocateObjectNumbers(this.n + 1);
 		structureRoot.Output(this);
 	}
@@ -663,8 +702,11 @@ function FPDFTagged_PutResourcesExtended()
 	}
 	var targetDateTimeText = yearText + "-" + monthText + "-" + dayText + "T" + hourText + ":" + minuteText + ":" + secondText + "Z";
 
+	/* This library object is not in scope. */
 	var lib = new clib();
 
+	/* Extensible Metadata Platform (XMP) semantics need a review. */
+	/* PDF 1.7 specification table 10.2.2 "Metadata Streams". */
 	var metadataOutput = [];
 	metadataOutput.push("<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\
 <x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\
@@ -696,6 +738,7 @@ function FPDFTagged_PutResourcesExtended()
 <?xpacket end=\"w\"?>");
 	var metadata = metadataOutput.join(String());
 
+	/* PDF 1.7 specification table 10.3 "Additional entries in a metadata stream dictionary". */
 	this._newobj();
 	this._out("<</Type /Metadata /Subtype /XML /Length " + lib.strlen(metadata) + ">>");
 	this._putstream(metadata);
@@ -706,6 +749,7 @@ function FPDFTagged_PutResourcesExtended()
 
 function FPDFTagged_PutCatalogExtended()
 {
+	/* PDF 1.7 specification table 3.25 "Entries in the catalog dictionary". */
 	var structureRoot = this.StructureRoot;
 	if(structureRoot !== null)
 	{

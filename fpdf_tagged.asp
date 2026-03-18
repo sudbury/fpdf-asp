@@ -113,7 +113,7 @@ function FPDFTaggedStructureRoot_Output(FPDFTagged)
 	}
 }
 
-/* Represents a structure element, referenced from the structure tree root or other structure elements.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
+/* Represents a structure element that can contain child structure elements, referenced from the structure tree root or other structure elements.  It could support a mixture of child structure elements and child marked-content sequences, but currently 'FPDFTaggedMarkedContentNode' is designed to combine a structure element with a single child marked-content sequence, so there currently isn't a representation of a raw marked-content sequence alone.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
 function FPDFTaggedStructureNode()
 {
 	this.Parent = null;
@@ -216,7 +216,7 @@ function FPDFTaggedStructureNode_SetAlternativeText(alternativeText)
 	this.AlternativeText = alternativeText;
 }
 
-/* Represents a structure element for a marked-content sequence, referenced from other structure elements.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
+/* Represents a structure element with a single child marked-content sequence, referenced from other structure elements.  It does not support child structure elements.  PDF 1.7 specification section 10.6.1 "Structure Hierarchy". */
 function FPDFTaggedMarkedContentNode()
 {
 	FPDFTaggedStructureNode.call(this);
@@ -284,6 +284,7 @@ function FPDFTagged_StartMarkedContent(tag)
 	markedContentNode.MarkedContentID = markedContentID;
 	markedContentNode.Tag = tag;
 	pageMarkedContentList.push(markedContentNode);
+	/* PDF 1.7 specification section 3.2.4 "Name Objects". */
 	/* PDF 1.7 specification section 10.6.3 "Structure Content" subsection "Marked-Content Sequences as Content Items". */
 	this._out("/" + tag + " <</MCID " + markedContentID.toString() + ">> BDC");
 	return markedContentNode;
@@ -294,6 +295,7 @@ function FPDFTagged_StartLineBreakMarkedContent()
 	/* PDF 1.7 specification table 10.7 "Marked-content operators". */
 	/* PDF 1.7 specification table 10.10 "Entries in a structure element dictionary". */
 	/* PDF 1.7 specification table 10.7.4 "Standard Structure Attributes". */
+	/* PDF 1.7 specification section 3.2.3 "String Objects" subsection "Hexadecimal Strings". */
 	this._out("/Span <</ActualText <0D0A>>> BDC");
 }
 
